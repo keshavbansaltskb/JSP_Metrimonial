@@ -1,0 +1,308 @@
+<%@page contentType="text/html" import='javax.servlet.http.Cookie,java.sql.*' pageEncoding="UTF-8"%>
+
+<%
+
+    try {
+        Cookie c[] = request.getCookies();
+        String email = null;
+        for (int i = 0; i < c.length; i++) {
+            if (c[i].getName().equals("login")) {
+                email = c[i].getValue();
+                break;
+            }
+        }
+        if (email == null) {
+            response.sendRedirect("index.jsp");
+        } else {
+            String gender = request.getParameter("gender");
+            String caste = request.getParameter("caste");
+            String religion = request.getParameter("religion");
+            try {
+
+                Class.forName("com.mysql.jdbc.Driver");
+                Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/project", "root", "");
+                String name = "";
+                Statement sts = cn.createStatement();
+                ResultSet rss = sts.executeQuery("select * from details where email='" + email + "'");
+                if (rss.next()) {
+                    name = rss.getString("fname")+" "+rss.getString("lname");
+                }
+
+%> 
+
+
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title><%=name%></title>
+         <link rel="icon" type="image/x-icon" href="img/icon.png">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="keywords" content="Marital Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template, 
+              Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design" />
+        <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+        <link href="css/bootstrap-3.1.1.min.css" rel='stylesheet' type='text/css' />
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <!-- Custom Theme files -->
+        <link href="css/style.css" rel='stylesheet' type='text/css' />
+        <link href='//fonts.googleapis.com/css?family=Oswald:300,400,700' rel='stylesheet' type='text/css'>
+        <link href='//fonts.googleapis.com/css?family=Ubuntu:300,400,500,700' rel='stylesheet' type='text/css'>
+        <!----font-Awesome----->
+        <link href="css/font-awesome.css" rel="stylesheet"> 
+        <!----font-Awesome----->
+        <script>
+            $(document).ready(function() {
+            $(".dropdown").hover(
+            function() {
+            $('.dropdown-menu', this).stop(true, true).slideDown("fast");
+            $(this).toggleClass('open');
+            },
+            function() {
+            $('.dropdown-menu', this).stop(true, true).slideUp("fast");
+            $(this).toggleClass('open');
+            }
+            );
+            });
+            $(document).on("click", ".fa.fa-heart-o", function() {
+            var id = $(this).attr("id");
+            $.post(
+            "favorite.jsp", {id: id}, function(data) {
+            data = data.trim();
+            if (data == "success") {
+            $("#" + id).attr("class", "fa fa-heart");
+
+            }
+            if (data == "delete") {
+            $("#" + id).attr("class", "fa fa-heart-o");
+            }
+            });
+
+            });
+            $(document).on("click", ".fa.fa-heart", function() {
+            var id = $(this).attr("id");
+            $.post(
+            "favorite.jsp", {id: id}, function(data) {
+            data = data.trim();
+            if (data == "success") {
+            $("#" + id).attr("class", "fa fa-heart");
+
+            }
+            if (data == "delete") {
+            $("#" + id).attr("class", "fa fa-heart-o");
+            }
+            });
+
+            });
+            $(document).ready(function(){
+            $(".fa.fa-heart-o").mouseover(function(){
+            var id = $(this).attr("id");
+            $("#r"+id).show();
+            }); 
+            $(".fa.fa-heart-o").mouseout(function(){
+            var id = $(this).attr("id");
+            $("#r"+id).hide();
+            }); 
+            });
+            $(document).ready(function(){
+            $(".fa.fa-heart").mouseover(function(){
+            var id = $(this).attr("id");
+            $("#rt"+id).show();
+            }); 
+            $(".fa.fa-heart").mouseout(function(){
+            var id = $(this).attr("id");
+            $("#rt"+id).hide();
+            }); 
+            });
+        </script>
+        <style>
+            .msgshow{
+                background-color:#f2f2f2;
+                color:black;
+                padding: 2px;
+                font-size: 12px;
+                margin-left: 100px;
+                font-family: serif;
+            }
+            .fa.fa-heart{
+                cursor:pointer;
+            }
+            .fa.fa-heart-o{
+                cursor:pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- ============================  Navigation Start =========================== -->
+        <%@include file="nav.jsp" %>
+        <!-- ============================  Navigation End ============================ -->
+        <div class="grid_3">
+            <div class="container">
+                <div class="breadcrumb1">
+                    <ul>
+                        <a href="index.html"><i class="fa fa-home home_1"></i></a>
+                        <span class="divider">&nbsp;|&nbsp;</span>
+                        <li class="current-page">Profile</li>
+                    </ul>
+                </div>
+                <div class="col-md-9 profile_left1">
+                    <h1>Profiles By Your Search</h1>
+                    <%
+                        PreparedStatement ps = cn.prepareStatement("select * from details where gender=? AND caste=? AND religion=? ");
+                        ps.setString(1, gender);
+                        ps.setString(2, caste);
+                        ps.setString(3, religion);
+                        ResultSet rs = ps.executeQuery();
+                        while (rs.next()) {
+                            
+                    %>
+
+
+
+                    <div class="profile_top">
+
+
+                        <div class="col-sm-3 profile_left-top">
+                            <img src="upload/<%=rs.getString("code")%>.jpg" class="img-responsive" alt=""/>
+                        </div>
+
+                        <div class="col-sm-9">
+                            <table class="table_working_hours">
+                                <tbody>
+                                    <tr class="opened_1">
+                                        <td class="day_label1">First Name :</td>
+                                        <td class="day_value"> <%=rs.getString("fname")%> </td>
+                                    </tr>
+                                    <tr class="opened">
+                                        <td class="day_label1">Last Name :</td>
+                                        <td class="day_value"> <%=rs.getString("lname")%></td>
+                                    </tr>
+                                    <tr class="opened">
+                                        <td class="day_label1">Email :</td>
+                                        <td class="day_value"> <%=rs.getString("email")%></td>
+                                    </tr>
+                                    <tr class="opened">
+                                        <td class="day_label1"> Gender :</td>
+                                        <td class="day_value"> <%=rs.getString("gender")%></td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                            <div class="buttons">
+                                <a href="view_profile.jsp?id=<%=rs.getString("code")%>"><div class="vertical">View Profile</div></a>
+                                <%
+                                    int likestatus = 0;
+                                    PreparedStatement psd = cn.prepareStatement("select * from fav where user_code=? AND email='" + email + "' ");
+                                    psd.setString(1, rs.getString("code"));
+                                    ResultSet rsl = psd.executeQuery();
+                                    if (rsl.next()) {
+                                        likestatus = rsl.getInt("status");
+
+                                    }
+                                    if (likestatus == 1) {
+                                %>
+
+                                <i class="fa fa-heart" id="<%=rs.getString("code")%>" style="color:red"></i>
+                                <%
+                                } else {
+                                %>
+                                <i class="fa fa-heart-o" id="<%=rs.getString("code")%>" style="color:red"></i>
+                                <%
+                                    }
+                                %>
+                                <br>
+                                <label style="display:none" class="msgshow" id="r<%=rs.getString("code")%>">Add to favorite list</label>
+                                <label style="display:none" class="msgshow" id="rt<%=rs.getString("code")%>">Remove from favorite list</label>
+                            </div>
+                        </div>
+                        <div class="clearfix"> </div>
+                    </div>
+                    <%
+                                
+                        }
+                    %>
+                </div>
+                <div class="col-md-3 match_right">
+                    <div class="profile_search1">
+                        <form method="post" ACTION="search_user.jsp">
+                            <input type="text" name="search" size="30" required="" placeholder="Search by Name and Code:">
+                            <input type="submit" value="Go">
+                        </form>
+                    </div>
+
+                    <div class="view_profile view_profile2">
+                        <h3>Profiles For You</h3>
+                        <%
+                            Statement st = cn.createStatement();
+                            ResultSet rse = st.executeQuery("select * from details where email='" + email + "'");
+                            if (rse.next()) {
+                                int count1 = 0;
+                                PreparedStatement psp = cn.prepareStatement("select * from details where gender<>? AND caste=? order by RAND()");
+                                psp.setString(1, rse.getString("gender"));
+                                psp.setString(2, rse.getString("caste"));
+                                ResultSet rsp = psp.executeQuery();
+                                while (rsp.next()) {
+                        %>
+                        <ul class="profile_item">
+
+                            <li class="profile_item-img">
+                                <img src="upload/<%=rsp.getString("code")%>.jpg" class="img-responsive" style="width:100px;height: 100px">
+                            </li>
+                            <li class="profile_item-desc">
+                                <h4><%=rsp.getString("fname")%> <%=rsp.getString("lname")%></h4>
+                                <p><%=rsp.getString("email")%></p><br>
+                                <a href="view_profile.jsp?id=<%=rsp.getString("code")%>"><div class="vertical">View Profile</div></a>
+                            </li>
+                            <div class="clearfix"> </div>
+
+                        </ul>
+
+                        <%
+                                    count1++;
+                                    if (count1 == 4) {
+                                        break;
+                                    }
+                                }
+                            }
+                        %>
+                    </div>
+                </div>
+                <div class="clearfix"> </div>
+            </div>
+        </div>
+        <div class="map">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3150859.767904157!2d-96.62081048651531!3d39.536794757966845!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sin!4v1408111832978"> </iframe>
+        </div>
+     <%@include file="footer.jsp" %>
+        <!-- FlexSlider -->
+        <link href="css/flexslider.css" rel='stylesheet' type='text/css' />
+        <script defer src="js/jquery.flexslider.js"></script>
+        <script type="text/javascript">
+            $(function() {
+            SyntaxHighlighter.all();
+            });
+            $(window).load(function() {
+            $('.flexslider').flexslider({
+            animation: "slide",
+            start: function(slider) {
+            $('body').removeClass('loading');
+            }
+            });
+            });
+        </script>
+        <!-- FlexSlider -->
+    </body>
+</html>	
+
+
+<%
+
+            } catch (Exception e) {
+                out.println(e.getMessage());
+            }
+        }
+    } catch (Exception er) {
+        response.sendRedirect("index.jsp");
+    }
+%>
